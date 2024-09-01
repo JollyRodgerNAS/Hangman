@@ -3,9 +3,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-List<string> keywords = ["food", "delicious", "stalin", "polpot", "angelus", "legna"];
-int numTries = 10;
+List<string> keywords = ["food", "delicious", "link", "spyro", "angelus", "legna"];
+int numTries = 6;
 int tryCounter = 0;
+int incorrectGuesses = 0;
 string guess;
 List<string> correctGuess = [];
 bool isPlaying = false;
@@ -14,10 +15,10 @@ char j;
 void Main()
 {
     chosenWord = GetWord(keywords);
-    foreach (string s in chosenWord)
+    /*foreach (string s in chosenWord)
     {
         Console.WriteLine(s);
-    }
+    }*/
     
 
     Console.WriteLine("Do you wish to play hangman? Y/N");
@@ -33,13 +34,14 @@ void Main()
             guess = GetGuess();
             Console.WriteLine($"Your guess was ---{guess}---");
 
-            bool isRight = isCorrect(guess, chosenWord);
+            bool isRight = IsCorrect(guess, chosenWord);
+            PrintHangman(incorrectGuesses);
 
             if (isRight)
             {
                 Console.WriteLine("");
                 Console.WriteLine("Congrats!");
-                bool check = ifWon(correctGuess, chosenWord);
+                bool check = IfWon(correctGuess, chosenWord);
 
                 if (check)
                 {
@@ -48,7 +50,7 @@ void Main()
                     isPlaying = false;
                 }
             }
-            else if (tryCounter >= numTries)
+            else if (incorrectGuesses >= numTries)
             {
                 Console.WriteLine("You ran out of tries! Game over.");
                 isPlaying = false;
@@ -56,6 +58,8 @@ void Main()
             else
             {
                 Console.WriteLine("You were wrong, keep trying!");
+                Console.WriteLine("Correct guesses so far are...");
+                Console.WriteLine(string.Join("", correctGuess));
             }
         }
     }
@@ -91,28 +95,26 @@ string GetGuess()
     return guess;
 }
 
-bool isCorrect(string guess, List<string> chosenWord)
+bool IsCorrect(string guess, List<string> chosenWord)
 {
     if (chosenWord.Contains(guess))
     {
         Console.WriteLine("You got a correct character!");
-        Console.WriteLine($"Correct character was {guess}");
         correctGuess.Add(guess);
         Console.WriteLine("Correct guesses so far include...");
         Console.Write(string.Join("", correctGuess));
-        tryCounter++;
         return true;
     }
     else
     {
-        tryCounter++;
+        incorrectGuesses++;
         return false;
     }
 }
 
-bool ifWon(List<string> correctGuess, List<string> chosenWord)
+bool IfWon(List<string> correctGuess, List<string> chosenWord)
 {
-    List<string> reorderedCorrectGuess = new List<string>();
+    List<string> reorderedCorrectGuess = [];
     foreach (var item in chosenWord)
     {
         if (correctGuess.Contains(item))
@@ -131,6 +133,85 @@ bool ifWon(List<string> correctGuess, List<string> chosenWord)
     }
 
     return false;
+}
+
+void PrintHangman(int incorrectGuesses)
+{
+    string[] hangmanStages =
+    {
+        @"
+           ____
+          |    |
+          |
+          |
+          |
+          |
+        __|__
+       |______|",
+        @"
+           ____
+          |    |
+          |    O
+          |
+          |
+          |
+        __|__
+       |______|",
+        @"
+           ____
+          |    |
+          |    O
+          |    |
+          |
+          |
+        __|__
+       |______|",
+        @"
+           ____
+          |    |
+          |    O
+          |   /|
+          |
+          |
+        __|__
+       |______|",
+        @"
+           ____
+          |    |
+          |    O
+          |   /|\
+          |
+          |
+        __|__
+       |______|",
+        @"
+           ____
+          |    |
+          |    O
+          |   /|\
+          |   /
+          |
+        __|__
+       |______|",
+        @"
+           ____
+          |    |
+          |    O
+          |   /|\
+          |   / \
+          |
+        __|__
+       |______|"
+    };
+
+    if (incorrectGuesses >= 0 && incorrectGuesses < hangmanStages.Length)
+    {
+        Console.WriteLine(hangmanStages[incorrectGuesses]);
+    }
+    else
+    {
+        Console.WriteLine("Invalid number of incorrect guesses.");
+    }
 }
 
 Main();
